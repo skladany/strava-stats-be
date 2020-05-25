@@ -28,6 +28,10 @@ app.use((req, res, next) => {
   next();
 });
 
+app.get("/", async (req, res) => {
+  res.send("OK Bob.");
+});
+
 app.get("/strava/distance_run/", async (req, res) => {
   const accessToken = await getAccessToken();
 

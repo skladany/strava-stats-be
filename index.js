@@ -35,10 +35,7 @@ app.get("/", async (req, res) => {
 app.get("/strava/distance_run/", async (req, res) => {
   const accessToken = await getAccessToken();
 
-  const stats = {
-    distance: 0,
-    runs: 0,
-  };
+  let stats = [];
 
   // 1/1/2020
   const after = req.query.after || 1577836800;
@@ -52,20 +49,31 @@ app.get("/strava/distance_run/", async (req, res) => {
     if (data.length < 1) {
       res.send([]);
     } else {
-      stats.distance += Array.from(data)
+      stats = Array.from(data)
         .filter((activity) => activity.type === "Run")
-        .reduce((distance, activity) => {
-          return activity.distance + distance;
-        }, 0);
+        .map(({ distance, start_date }) => {
+          return {
+            distance,
+            start_date,
+          };
+        });
 
-      stats.runs += Array.from(data)
-        .filter((activity) => activity.type === "Run")
-        .reduce((runs) => {
-          return runs + 1;
-        }, 0);
+      // stats.distance += Array.from(data)
+      //   .filter((activity) => activity.type === "Run")
+      //   .reduce((distance, activity) => {
+      //     return activity.distance + distance;
+      //   }, 0);
+
+      // stats.runs += Array.from(data)
+      //   .filter((activity) => activity.type === "Run")
+      //   .reduce((runs) => {
+      //     return runs + 1;
+      //   }, 0);
+
+      //res.send(data);
 
       // res.send([stats, data]);
-      res.send([stats]);
+      res.send(stats);
     }
   } catch (error) {
     console.error(error);

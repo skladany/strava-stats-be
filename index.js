@@ -9,11 +9,15 @@ const stravaConfig = {
   callbackURL: process.env.STRAVA_CALLBACK,
 };
 
-async function getAccessToken() {
+async function getAccessToken(athlete) {
+  refresh_token =
+    "steve" === athlete
+      ? process.env.STRAVA_REFRESH_TOKEN_STEVE
+      : process.env.STRAVA_REFRESH_TOKEN;
   const response = await axios.post(`https://www.strava.com/oauth/token`, {
     client_id: process.env.STRAVA_CLIENT_ID,
     client_secret: process.env.STRAVA_CLIENT_SECRET,
-    refresh_token: process.env.STRAVA_REFRESH_TOKEN,
+    refresh_token,
     grant_type: "refresh_token",
   });
 
@@ -32,8 +36,9 @@ app.get("/", async (req, res) => {
   res.send("OK Bob.");
 });
 
-app.get("/strava/distance_run/", async (req, res) => {
-  const accessToken = await getAccessToken();
+app.get("/strava/distance_run/:athlete?", async (req, res) => {
+  const athlete = req.params.athlete;
+  const accessToken = await getAccessToken(athlete);
 
   let stats = [];
 

@@ -46,7 +46,7 @@ app.get("/strava/distance_run/:athlete?", async (req, res) => {
   const after = req.query.after || 1641013200;
   const per_page = req.query.per_page || 30;
   let page = req.query.page || 1;
-  const endpoint = `https://www.strava.com/api/v3/athlete/activities?access_token=${accessToken}&after=${after}&per_page=${per_page}&page=${page}&`;
+  const endpoint = `https://www.strava.com/api/v3/athlete/activities?access_token=${accessToken}&after=${after}&per_page=${per_page}&page=${page}`;
 
   try {
     let { data } = await axios.get(endpoint);
@@ -56,28 +56,14 @@ app.get("/strava/distance_run/:athlete?", async (req, res) => {
     } else {
       stats = Array.from(data)
         .filter((activity) => activity.type === "Run")
-        .map(({ distance, start_date }) => {
+        .map(({ distance, total_elevation_gain, start_date }) => {
           return {
             distance,
+            total_elevation_gain,
             start_date,
           };
         });
 
-      // stats.distance += Array.from(data)
-      //   .filter((activity) => activity.type === "Run")
-      //   .reduce((distance, activity) => {
-      //     return activity.distance + distance;
-      //   }, 0);
-
-      // stats.runs += Array.from(data)
-      //   .filter((activity) => activity.type === "Run")
-      //   .reduce((runs) => {
-      //     return runs + 1;
-      //   }, 0);
-
-      //res.send(data);
-
-      // res.send([stats, data]);
       res.send(stats);
     }
   } catch (error) {
